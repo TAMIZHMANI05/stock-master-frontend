@@ -8,6 +8,17 @@ import InventoryDashboard from '../pages/InventoryDashboard';
 import WarehouseDashboard from '../pages/WarehouseDashboard';
 import ForgotPassword from '../pages/ForgotPassword';
 
+// Manager Pages
+import ManagerOperations from '../pages/manager/ManagerOperations';
+import ManagerStock from '../pages/manager/ManagerStock';
+import ManagerMoveHistory from '../pages/manager/ManagerMoveHistory';
+import ManagerSettings from '../pages/manager/ManagerSettings';
+
+// Staff Pages
+import StaffOperations from '../pages/staff/StaffOperations';
+import StaffStock from '../pages/staff/StaffStock';
+import StaffMoveHistory from '../pages/staff/StaffMoveHistory';
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -25,6 +36,38 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/manager/operations"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.INVENTORY_MANAGER]}>
+            <ManagerOperations />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/stock"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.INVENTORY_MANAGER]}>
+            <ManagerStock />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/move-history"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.INVENTORY_MANAGER]}>
+            <ManagerMoveHistory />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/settings"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.INVENTORY_MANAGER]}>
+            <ManagerSettings />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Protected Routes - Warehouse Staff Only */}
       <Route
@@ -32,6 +75,30 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={[ROLES.WAREHOUSE_STAFF]}>
             <WarehouseDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/staff/operations"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.WAREHOUSE_STAFF]}>
+            <StaffOperations />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/staff/stock"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.WAREHOUSE_STAFF]}>
+            <StaffStock />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/staff/move-history"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.WAREHOUSE_STAFF]}>
+            <StaffMoveHistory />
           </ProtectedRoute>
         }
       />
