@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, ROLES } from '../contexts/AuthContext';
 
-
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,63 +11,43 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const mockUsers = {
-    'manager@stock.com': {
-      email: 'manager@stock.com',
-      password: 'password123',
-      role: ROLES.INVENTORY_MANAGER,
-      name: 'John Manager',
-      id: '1'
-    },
-    'staff@stock.com': {
-      email: 'staff@stock.com',
-      password: 'password123',
-      role: ROLES.WAREHOUSE_STAFF,
-      name: 'Jane Staff',
-      id: '2'
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
     try {
-      const user = mockUsers[email];
+      // Use the login function from AuthContext
+      const result = await login(email, password);
 
-      if (!user || user.password !== password) {
-        throw new Error('Invalid credentials');
-      }
-
-      const mockResponse = {
-        token: `mock-jwt-token-${Date.now()}`,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role
-        }
-      };
-
-      localStorage.setItem('token', mockResponse.token);
-      localStorage.setItem('user', JSON.stringify(mockResponse.user));
-
-      const loginEvent = new CustomEvent('mock-login', { 
-        detail: mockResponse 
-      });
-      window.dispatchEvent(loginEvent);
-
-      if (user.role === ROLES.INVENTORY_MANAGER) {
+      // Role-based redirection
+      if (result.role === ROLES.INVENTORY_MANAGER) {
         navigate('/manager/dashboard');
-      } else if (user.role === ROLES.WAREHOUSE_STAFF) {
+      } else if (result.role === ROLES.WAREHOUSE_STAFF) {
         navigate('/staff/inventory');
+      } else {
+        throw new Error('Unknown user role');
       }
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
       console.error('Login error:', err);
+      
+      // Handle different error scenarios
+      if (err.response) {
+        // Server responded with error
+        if (err.response.status === 401) {
+          setError('Invalid email or password');
+        } else if (err.response.status === 400) {
+          setError(err.response.data?.message || 'Please provide valid credentials');
+        } else {
+          setError(err.response.data?.message || 'Login failed. Please try again.');
+        }
+      } else if (err.request) {
+        // Request made but no response
+        setError('Unable to connect to server. Please check your connection.');
+      } else {
+        // Other errors
+        setError(err.message || 'An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
